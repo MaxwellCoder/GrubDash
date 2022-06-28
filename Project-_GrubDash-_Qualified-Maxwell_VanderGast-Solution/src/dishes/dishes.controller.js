@@ -1,4 +1,4 @@
-const res = require("express/lib/response");
+const { resolve } = require("express/lib/response");
 const path = require("path");
 const dishes = require(path.resolve("src/data/dishes-data"));
 const nextId = require("../utils/nextId");
