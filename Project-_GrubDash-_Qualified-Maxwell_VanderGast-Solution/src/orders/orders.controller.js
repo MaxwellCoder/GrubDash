@@ -64,7 +64,7 @@ const hasValidProperty = (property) => {
     };
 };
 
-const create = (req, res) => {
+const createOrder = (req, res) => {
     const { data: { deliverTo, mobileNumber, status, dishes } } = req.body;
     const id = nextId();
 
@@ -79,7 +79,7 @@ const create = (req, res) => {
     res.status(201).json({ data: newOrder });
 }
 
-const read = (req, res) => {
+const readOrder = (req, res) => {
     const foundOrder = res.locals.order;
 
     res.json({ data: foundOrder });
@@ -105,7 +105,7 @@ const deleteValidator = (req, res, next) => {
     next({ status: 400, message: "An order cannot be deleted unless it is pending"});
 }
 
-const update = (req,res) => {
+const updateOrder = (req,res) => {
     const { data: { deliverTo, mobileNumber, status, dishes } = {} } = req.body;
     const foundOrder = res.locals.order
 
@@ -120,7 +120,7 @@ const update = (req,res) => {
     res.json({ data: updatedOrder });
 }
 
-const destroy = (req,res) => {
+const destroyOrder = (req,res) => {
     const { orderId } = req.params;
     const index = orders.findIndex((order) => order.id == orderId);
 
@@ -136,7 +136,7 @@ module.exports = {
       hasValidProperty("deliverTo"),
       hasValidProperty("mobileNumber"),
       hasValidProperty("dishes"),
-      create,
+      createOrder,
     ],
     update: [
       orderExists,
@@ -145,8 +145,8 @@ module.exports = {
       hasValidProperty("dishes"),
       hasValidProperty("id"),
       hasValidProperty("status"),
-      update,  
+      updateOrder,  
     ],
-    read: [orderExists, read],
-    delete: [orderExists,deleteValidator,destroy],
+    read: [orderExists, readOrder],
+    delete: [orderExists,deleteValidator,destroyOrder],
 };
