@@ -51,7 +51,7 @@ const dishExists = (req,res,next) => {
     next({ status:404, message: `Dish ID does not exist: ${dishId}`});
 };
 
-const create = (req, res) => {
+const createDish = (req, res) => {
     const { data: { name, description, price, image_url } } = req.body;
     const id = nextId();
     const newDish = {
@@ -66,7 +66,7 @@ const create = (req, res) => {
     res.status(201).json({ data: newDish });
 };
 
-const update = (req,res) => {
+const updateDish = (req,res) => {
     const { data: { name, description, price, image_url } = {} } = req.body;
     let foundDish = res.locals.dish
 
@@ -81,7 +81,7 @@ const update = (req,res) => {
     res.json({ data: updatedDish });
 };
 
-const read = (req, res) => {
+const readDish = (req, res) => {
    const foundDish = res.locals.dish;
 
     res.json({ data: foundDish });
@@ -94,7 +94,7 @@ module.exports= {
         hasValidProperty("description"),
         hasValidProperty("price"),
         hasValidProperty("image_url"),
-        create,
+        createDish,
     ],
     update:[
         dishExists,
@@ -103,7 +103,7 @@ module.exports= {
         hasValidProperty("description"),
         hasValidProperty("price"),
         hasValidProperty("image_url"),
-        update,
+        updateDish,
     ], 
-    read: [dishExists, read],
+    read: [dishExists, readDish],
 };
