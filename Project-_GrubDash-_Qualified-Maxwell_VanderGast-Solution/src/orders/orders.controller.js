@@ -106,19 +106,14 @@ function deleteValidator(req, res, next) => {
 }
 
 function updateOrder(req,res) => {
-    const { data: { deliverTo, mobileNumber, status, dishes } = {} } = req.body;
-    const foundOrder = res.locals.order
-
-   updatedOrder = {
-       id: foundOrder.id,
-       deliverTo,
-       mobileNumber,
-       status,
-       dishes,
-   }
-
-    res.json({ data: updatedOrder });
+  const orderId = req.params.orderId;
+  const order = res.locals.order;
+  if (!order.id) {
+    order.id = orderId;
+  }
+  res.json({ data: order });
 }
+
 
 function destroyOrder(req,res) => {
     const { orderId } = req.params;
