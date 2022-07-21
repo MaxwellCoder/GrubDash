@@ -67,19 +67,13 @@ function createDish(req, res) => {
 };
 
 function updateDish(req,res) => {
-    const { data: { name, description, price, image_url } = {} } = req.body;
-    let foundDish = res.locals.dish
-
-    updatedDish = {
-        id: foundDish.id,
-        name,
-        description,
-        price,
-        image_url,
-    }
-    
-    res.json({ data: updatedDish });
-};
+  const dishId = req.params.dishId;
+  const updatedDish = res.locals.dish;
+  if (!updatedDish.id) {
+    updatedDish.id = dishId;
+  }
+  res.json({ data: updatedDish });
+}
 
 function readDish (req, res) => {
    const foundDish = res.locals.dish;
