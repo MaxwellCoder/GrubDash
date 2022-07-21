@@ -41,7 +41,7 @@ const hasValidProperty = (property) => {
     };
   };
 
-const dishExists = (req,res,next) => {
+function dishExists(req,res,next) => {
     const { dishId } = req.params;
     const foundDish = dishes.find((dish) => dish.id == dishId);
     if(foundDish) {
@@ -51,7 +51,7 @@ const dishExists = (req,res,next) => {
     next({ status:404, message: `Dish ID does not exist: ${dishId}`});
 };
 
-const createDish = (req, res) => {
+function createDish(req, res) => {
     const { data: { name, description, price, image_url } } = req.body;
     const id = nextId();
     const newDish = {
@@ -66,7 +66,7 @@ const createDish = (req, res) => {
     res.status(201).json({ data: newDish });
 };
 
-const updateDish = (req,res) => {
+function updateDish(req,res) => {
     const { data: { name, description, price, image_url } = {} } = req.body;
     let foundDish = res.locals.dish
 
@@ -81,7 +81,7 @@ const updateDish = (req,res) => {
     res.json({ data: updatedDish });
 };
 
-const readDish = (req, res) => {
+function readDish (req, res) => {
    const foundDish = res.locals.dish;
 
     res.json({ data: foundDish });
