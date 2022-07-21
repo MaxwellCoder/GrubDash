@@ -64,7 +64,7 @@ const hasValidProperty = (property) => {
     };
 };
 
-const createOrder = (req, res) => {
+function createOrder(req, res) => {
     const { data: { deliverTo, mobileNumber, status, dishes } } = req.body;
     const id = nextId();
 
@@ -79,13 +79,13 @@ const createOrder = (req, res) => {
     res.status(201).json({ data: newOrder });
 }
 
-const readOrder = (req, res) => {
+function readOrder(req, res) => {
     const foundOrder = res.locals.order;
 
     res.json({ data: foundOrder });
 }
 
-const orderExists = (req,res,next) => {
+function orderExists(req,res,next) => {
     const { orderId } = req.params;
     const foundOrder = orders.find((order) => order.id == orderId);
     
@@ -96,7 +96,7 @@ const orderExists = (req,res,next) => {
     next({ status: 404, message: `Order id does not exist: ${ orderId }`});
 }
 
-const deleteValidator = (req, res, next) => {
+function deleteValidator(req, res, next) => {
     const foundOrder = res.locals.order;
     
     if(foundOrder.status == "pending"){
@@ -105,7 +105,7 @@ const deleteValidator = (req, res, next) => {
     next({ status: 400, message: "An order cannot be deleted unless it is pending"});
 }
 
-const updateOrder = (req,res) => {
+function updateOrder(req,res) => {
     const { data: { deliverTo, mobileNumber, status, dishes } = {} } = req.body;
     const foundOrder = res.locals.order
 
@@ -120,7 +120,7 @@ const updateOrder = (req,res) => {
     res.json({ data: updatedOrder });
 }
 
-const destroyOrder = (req,res) => {
+function destroyOrder(req,res) => {
     const { orderId } = req.params;
     const index = orders.findIndex((order) => order.id == orderId);
 
