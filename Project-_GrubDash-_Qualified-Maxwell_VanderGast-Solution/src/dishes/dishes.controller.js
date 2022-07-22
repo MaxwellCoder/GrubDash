@@ -1,72 +1,76 @@
 const path = require("path");
 const dishes = require(path.resolve("src/data/dishes-data"));
-const nextId = require("../utils/nextId");
+const nextId = require("../utils/nextId"); 
 
-function list(req, res, next){
-    res.json({ data: dishes });
-};
-
-function hasValidProperty(property){
-    return (req, res, next) => {
-      const { data = {} } = req.body;
-      if (property === "id") {
-        const { dishId } = req.params;
-        dishId === data[property] || !data[property]
-          ? next()
-          : next({
-              status: 400,
-              message: `Dish id does not match: ${data[property]}`,
-            });
-      }
-      if (data[property]) {
-        if (property === "price") {
-          data[property] > 0 && data[property] === Number(data[property])
-            ? next()
-            : next({
-                status: 400,
-                message:
-                  "Dish must have a price that is an integer greater than 0",
-              });
-        } else {
-          data[property].length > 0
-            ? next()
-            : next({ status: 400, message: `Must include a ${property}` });
-        }
-      } else {
-        next({
-          status: 400,
-          message: `Dish must include a ${property}`,
-        });
-      }
-    };
-  };
-
-function dishExists(req,res,next){
-    const { dishId } = req.params;
-    const foundDish = dishes.find((dish) => dish.id == dishId);
-    if(foundDish) {
-        res.locals.dish = foundDish;
-        return next();
+function hasValidProperty(req, res, next) {  
+  const dish = req.body.data;
+  const properties = ['name', 'description', 'price', 'image_url'];
+  for (let property of properties) {
+    if (!dish[property]) {
+      return next({
+        status: 400,
+        message: `Dish must include a ${property}`,
+      });
     }
-    next({ status:404, message: `Dish ID does not exist: ${dishId}`});
+  }
+  res.locals.dish = dish;
+  next();
+}
+
+function hasValidPrice(req, res, next) { 
+  const price = res.locals.dish.price;
+  if (typeof(price) !== 'number' || price <= 0 || price !== parseInt(price)) {
+    return next({
+      status: 400,
+      message: 'Dish must have a price that is an integer greater than 0',
+    });
+  } 
+  next();
+}
+
+function dishExists(req, res, next) { 
+  const dishId = req.params.dishId;
+  const foundDish = dishes.find((dish) => dish.id === dishId);
+  if (foundDish) {
+    res.locals.dish = foundDish;
+    return next();
+  }
+  next({
+    status: 404,
+    message: `Dish id not found: ${req.params.dishId}`,
+  });
+}
+
+function deleteValidator(req, res, next) { 
+  const dishId = req.params.dishId;
+  const updatedDish = res.locals.dish;    
+  if (!updatedDish.id) { 
+    return next();      
+  }
+  if (dishId !== updatedDish.id) {
+    return next({
+      status: 400,
+      message: `Dish id does not match route id. Dish: ${updatedDish.id}, Route: ${dishId}`,
+    });
+  }
+  next();
+}
+function list(req, res) { 
+  res.json({ data: dishes })
 };
 
-function createDish(req, res){
-    const { data: { name, description, price, image_url } } = req.body;
-    const id = nextId();
-    const newDish = {
-        id,
-        name,
-        description,
-        price,
-        image_url,
-    };
-
-    dishes.push(newDish);
-    res.status(201).json({ data: newDish });
+function create(req, res) { 
+  const newDish = res.locals.dish;
+  newDish.id = nextId();
+  dishes.push(newDish);
+  res.status(201).json({ data: newDish });
 };
 
-function updateDish(req,res){
+function read(req, res) {  
+  res.json({ data: res.locals.dish });
+}
+
+function update(req, res) { 
   const dishId = req.params.dishId;
   const updatedDish = res.locals.dish;
   if (!updatedDish.id) {
@@ -75,29 +79,9 @@ function updateDish(req,res){
   res.json({ data: updatedDish });
 }
 
-function readDish (req, res){
-   const foundDish = res.locals.dish;
-
-    res.json({ data: foundDish });
-};
-
-module.exports= {
-    list,
-    create:[
-        hasValidProperty("name"),
-        hasValidProperty("description"),
-        hasValidProperty("price"),
-        hasValidProperty("image_url"),
-        createDish,
-    ],
-    update:[
-        dishExists,
-        hasValidProperty("id"),
-        hasValidProperty("name"),
-        hasValidProperty("description"),
-        hasValidProperty("price"),
-        hasValidProperty("image_url"),
-        updateDish,
-    ], 
-    read: [dishExists, readDish],
-};
+module.exports = {
+  list, 
+  create: [hasValidProperty, hasValidPrice, create],
+  read: [dishExists, read],
+  update: [dishExists, hasValidProperty, hasValidPrice, deleteValidator, update],
+}
