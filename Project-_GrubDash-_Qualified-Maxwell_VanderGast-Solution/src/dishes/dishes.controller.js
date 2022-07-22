@@ -2,11 +2,11 @@ const path = require("path");
 const dishes = require(path.resolve("src/data/dishes-data"));
 const nextId = require("../utils/nextId");
 
-const list = ( req, res, next ) => {
+function list(req, res, next){
     res.json({ data: dishes });
 };
 
-const hasValidProperty = (property) => {
+function hasValidProperty(property){
     return (req, res, next) => {
       const { data = {} } = req.body;
       if (property === "id") {
@@ -41,7 +41,7 @@ const hasValidProperty = (property) => {
     };
   };
 
-function dishExists(req,res,next) => {
+function dishExists(req,res,next){
     const { dishId } = req.params;
     const foundDish = dishes.find((dish) => dish.id == dishId);
     if(foundDish) {
@@ -51,7 +51,7 @@ function dishExists(req,res,next) => {
     next({ status:404, message: `Dish ID does not exist: ${dishId}`});
 };
 
-function createDish(req, res) => {
+function createDish(req, res){
     const { data: { name, description, price, image_url } } = req.body;
     const id = nextId();
     const newDish = {
@@ -66,7 +66,7 @@ function createDish(req, res) => {
     res.status(201).json({ data: newDish });
 };
 
-function updateDish(req,res) => {
+function updateDish(req,res){
   const dishId = req.params.dishId;
   const updatedDish = res.locals.dish;
   if (!updatedDish.id) {
@@ -75,7 +75,7 @@ function updateDish(req,res) => {
   res.json({ data: updatedDish });
 }
 
-function readDish (req, res) => {
+function readDish (req, res){
    const foundDish = res.locals.dish;
 
     res.json({ data: foundDish });
