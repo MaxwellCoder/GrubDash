@@ -3,11 +3,11 @@ const orders = require(path.resolve("src/data/orders-data"));
 const nextId = require("../utils/nextId");
 
 
-const list = (req, res) => {
+function list(req, res){
     res.json({ data: orders });
 };
 
-const hasValidProperty = (property) => {
+function hasValidProperty(property){
     return (req, res, next) => {
       const { data = {} } = req.body;
       if (property === "id") {
@@ -64,7 +64,7 @@ const hasValidProperty = (property) => {
     };
 };
 
-function createOrder(req, res) => {
+function createOrder(req, res){
     const { data: { deliverTo, mobileNumber, status, dishes } } = req.body;
     const id = nextId();
 
@@ -79,13 +79,13 @@ function createOrder(req, res) => {
     res.status(201).json({ data: newOrder });
 }
 
-function readOrder(req, res) => {
+function readOrder(req, res){
     const foundOrder = res.locals.order;
 
     res.json({ data: foundOrder });
 }
 
-function orderExists(req,res,next) => {
+function orderExists(req,res,next){
     const { orderId } = req.params;
     const foundOrder = orders.find((order) => order.id == orderId);
     
@@ -96,7 +96,7 @@ function orderExists(req,res,next) => {
     next({ status: 404, message: `Order id does not exist: ${ orderId }`});
 }
 
-function deleteValidator(req, res, next) => {
+function deleteValidator(req, res, next){
     const foundOrder = res.locals.order;
     
     if(foundOrder.status == "pending"){
@@ -105,7 +105,7 @@ function deleteValidator(req, res, next) => {
     next({ status: 400, message: "An order cannot be deleted unless it is pending"});
 }
 
-function updateOrder(req,res) => {
+function updateOrder(req,res){
   const orderId = req.params.orderId;
   const order = res.locals.order;
   if (!order.id) {
@@ -115,7 +115,7 @@ function updateOrder(req,res) => {
 }
 
 
-function destroyOrder(req,res) => {
+function destroyOrder(req,res){
     const { orderId } = req.params;
     const index = orders.findIndex((order) => order.id == orderId);
 
